@@ -75,7 +75,7 @@
                 return;
             }
 
-            const nextPrompt = `I would take ${userInput} on a picnic because...`;
+            const nextPrompt = `We are playing a game of 'I would take ... on a picnic. The rules are simple, just repeat each of the items previously stated in an ordered list format. I would take ${userInput} on a picnic because. Now your turn, what is one thing you would take in addition to the previously mentioned item(s)?`;
             getGeminiResponse(apiKey, nextPrompt);
         }
     </script>
