@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Picnic Game with Gemini</title>
+</head>
+<body>
+    <h1>Picnic Game</h1>
+
+    <label for="apiKey">Gemini API Key:</label>
+    <input type="text" id="apiKey" name="apiKey">
+    <br><br>
+
+    <button onclick="startGame()">Start Game</button>
+
+    <div id="gameOutput">
+        <!-- Game prompts and responses will appear here -->
+    </div>
+
+    <label for="userInput">I would take:</label>
+    <input type="text" id="userInput" name="userInput">
+    <button onclick="submitInput()">Submit</button>
+
+    <script>
+        async function startGame() {
+            const apiKey = document.getElementById('apiKey').value;
+            if (!apiKey) {
+                document.getElementById('gameOutput').innerText = "Please enter your API key.";
+                return;
+            }
+
+            document.getElementById('gameOutput').innerText = "Game started! Waiting for Gemini...";
+            // Call Gemini to get the first prompt
+            const initialPrompt = "I'm going on a picnic. I would take..."; // Initial game prompt
+            getGeminiResponse(apiKey, initialPrompt);
+        }
+
+        async function getGeminiResponse(apiKey, prompt) {
+            const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey;
+            const data = {
+                prompt: prompt
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const responseData = await response.json();
+                console.log(responseData); // Log the response for debugging
+
+                // Extract the text from the response
+                let geminiText = "Error: Could not get response.";
+                if (responseData && responseData.candidates && responseData.candidates[0] && responseData.candidates[0].content && responseData.candidates[0].content.parts && responseData.candidates[0].content.parts[0].text) {
+                    geminiText = responseData.candidates[0].content.parts[0].text;
+                }
+
+                document.getElementById('gameOutput').innerText = geminiText;
+
+            } catch (error) {
+                console.error('Error calling Gemini API:', error);
+                document.getElementById('gameOutput').innerText = "Error calling Gemini API. Check console.";
+            }
+        }
+
+        async function submitInput() {
+            const apiKey = document.getElementById('apiKey').value;
+            const userInput = document.getElementById('userInput').value;
+
+            if (!userInput) {
+                document.getElementById('gameOutput').innerText = "Please enter what you would take.";
+                return;
+            }
+
+            const nextPrompt = `I would take ${userInput} on a picnic because...`;
+            getGeminiResponse(apiKey, nextPrompt);
+        }
+    </script>
+</body>
+</html>
